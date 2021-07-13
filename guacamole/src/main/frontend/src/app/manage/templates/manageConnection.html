@@ -13,7 +13,7 @@
             <tr>
                 <th>{{'MANAGE_CONNECTION.FIELD_HEADER_NAME' | translate}}</th>
               
-                <td><input type="text" ng-model="connection.name" autocorrect="off" autocapitalize="off"></td>
+                <td><input type="text" ng-model="connection.name" autocorrect="off" autocapitalize="off"/></td>
             </tr>
             
             <!-- Edit connection location -->
@@ -35,6 +35,23 @@
                     <select ng-model="connection.protocol" ng-options="protocol.value.name as getProtocolName(protocol.value.name) | translate for protocol in protocols | toArray | orderBy: value.name"></select>
                 </td>
             </tr>
+        </table>
+    </div>
+
+    <!-- URL property editor -->
+    <div class="header">
+        <h2>External URL</h2>
+    </div>
+    <div class="section">
+        <table class="properties">
+
+            <!-- Edit connection URL -->
+            <tr>
+                <th>External URL</th>
+            
+                <td><input type="text" ng-model="parameters.externalURL" autocorrect="off" autocapitalize="off"/></td>
+            </tr>
+            
         </table>
     </div>
 

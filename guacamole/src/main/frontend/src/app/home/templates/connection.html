@@ -1,16 +1,40 @@
 <a class="home-connection"
-   ng-href="{{ item.getClientURL() }}"
-   ng-class="{active: item.getActiveConnections()}">
+ng-href="{{ item.getClientURL() }}"
+ng-class="{active: item.getActiveConnections()}">
+    <table>
+        <tr>
+            <td>
 
-    <!-- Connection icon -->
-    <div class="icon type" ng-class="item.protocol"></div>
+                <!-- Connection icon -->
+                <div class="icon type" ng-class="item.protocol"></div>
 
-    <!-- Connection name -->
-    <span class="name">{{item.name}}</span>
+            </td>
+            <td>
 
-    <!-- Active user count -->
-    <span class="activeUserCount" ng-show="item.getActiveConnections()"
-        translate="HOME.INFO_ACTIVE_USER_COUNT"
-        translate-values="{USERS: item.getActiveConnections()}"></span>
+                <!-- Connection name -->
+                <span class="name">{{item.name}}</span>
+
+            </td>
+            <td>
+
+                <!-- Active user count -->
+                <span class="activeUserCount" ng-show="item.getActiveConnections()"
+                    translate="HOME.INFO_ACTIVE_USER_COUNT"
+                    translate-values="{USERS: item.getActiveConnections()}"></span>
+
+            </td>
+
+
+            <td ng-if="item.wrappedItem.parameters.externalURL">
+                <!-- Connection icon -->
+                <a href="{{ item.wrappedItem.parameters.externalURL }}" target="_blank" rel="noopener noreferrer">
+                    <img src="images/webicon.png" style = "width: 20px;height: 20px;">
+                    </img>
+                </a>
+
+            </td>
+        </tr>
+    </table>
 
 </a>
+

@@ -18,59 +18,85 @@
  */
 
 /**
- * The controller for the home page.
- */
+* The controller for the home page.
+*/
 angular.module('home').controller('homeController', ['$scope', '$injector', 
-        function homeController($scope, $injector) {
+    function homeController($scope, $injector) {
 
     // Get required types
     var ConnectionGroup  = $injector.get('ConnectionGroup');
-    var GroupListItem    = $injector.get('GroupListItem');
-            
+        
     // Get required services
     var authenticationService  = $injector.get('authenticationService');
     var connectionGroupService = $injector.get('connectionGroupService');
+    var connectionService      = $injector.get('connectionService');
     var dataSourceService      = $injector.get('dataSourceService');
     var requestService         = $injector.get('requestService');
 
     /**
-     * Map of data source identifier to the root connection group of that data
-     * source, or null if the connection group hierarchy has not yet been
-     * loaded.
-     *
-     * @type Object.<String, ConnectionGroup>
-     */
+    * Map of data source identifier to the root connection group of that data
+    * source, or null if the connection group hierarchy has not yet been
+    * loaded.
+    *
+    * @type Object.<String, ConnectionGroup>
+    */
     $scope.rootConnectionGroups = null;
 
     /**
-     * Array of all connection properties that are filterable.
-     *
-     * @type String[]
-     */
+    * Array of all connection properties that are filterable.
+    *
+    * @type String[]
+    */
     $scope.filteredConnectionProperties = [
         'name'
     ];
 
     /**
-     * Array of all connection group properties that are filterable.
-     *
-     * @type String[]
-     */
+    * Array of all connection group properties that are filterable.
+    *
+    * @type String[]
+    */
     $scope.filteredConnectionGroupProperties = [
         'name'
     ];
 
+    $scope.childParamsLoader = {};
+
     /**
-     * Returns whether critical data has completed being loaded.
-     *
-     * @returns {Boolean}
-     *     true if enough data has been loaded for the user interface to be
-     *     useful, false otherwise.
-     */
+    * Returns whether critical data has completed being loaded.
+    *
+    * @returns {Boolean}
+    *     true if enough data has been loaded for the user interface to be
+    *     useful, false otherwise.
+    */
     $scope.isLoaded = function isLoaded() {
 
-        return $scope.rootConnectionGroups !== null;
+        return $scope.rootConnectionGroups !== null && Object.keys($scope.childParamsLoader).map(function(key){return $scope.childParamsLoader[key]}).reduce((x, y) => x && y, true);
 
+    };
+
+    var exploreAll = function exploreAll(connection, dataSource){
+
+        if(connection.identifier != ConnectionGroup.ROOT_IDENTIFIER && !connection.type){
+            $scope.childParamsLoader[connection.identifier] = false;
+            connectionService.getConnectionParameters(dataSource, connection.identifier).then(
+                function parametersRetrieved(parameters) {
+                connection.parameters = parameters;
+                $scope.childParamsLoader[connection.identifier] = true;
+            }, function parametersNotRetrieved() {
+                $scope.childParamsLoader[connection.identifier] = true;
+            });
+        }
+
+        if(connection.childConnections){
+            connection.childConnections.forEach(child => exploreAll(child, dataSource));
+        }
+
+        if(connection.childConnectionGroups){
+            connection.childConnectionGroups.forEach(child => exploreAll(child, dataSource));
+        }
+
+        return;
     };
 
     // Retrieve root groups and all descendants
@@ -80,6 +106,7 @@ angular.module('home').controller('homeController', ['$scope', '$injector',
         ConnectionGroup.ROOT_IDENTIFIER
     )
     .then(function rootGroupsRetrieved(rootConnectionGroups) {
+        Object.keys(rootConnectionGroups).forEach(key => exploreAll(rootConnectionGroups[key], key));
         $scope.rootConnectionGroups = rootConnectionGroups;
     }, requestService.DIE);
 
