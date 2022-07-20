@@ -41,6 +41,7 @@ import org.apache.guacamole.properties.StringSetProperty;
 import org.apache.guacamole.resource.Resource;
 import org.apache.guacamole.resource.ResourceServlet;
 import org.apache.guacamole.resource.SequenceResource;
+import org.apache.guacamole.resource.WebApplicationResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,8 @@ public class ExtensionModule extends ServletModule {
             "1.0.0",
             "1.1.0",
             "1.2.0",
-            "1.3.0"
+            "1.3.0",
+            "1.4.0"
         ));
 
     /**
@@ -220,7 +222,7 @@ public class ExtensionModule extends ServletModule {
     }
 
     /**
-     * Binds each of the the given AuthenticationProvider classes such that any
+     * Binds each of the given AuthenticationProvider classes such that any
      * service requiring access to the AuthenticationProvider can obtain it via
      * injection.
      *
@@ -276,7 +278,7 @@ public class ExtensionModule extends ServletModule {
     }
 
     /**
-     * Binds each of the the given Listener classes such that any
+     * Binds each of the given Listener classes such that any
      * service requiring access to the Listener can obtain it via
      * injection.
      *
@@ -597,6 +599,9 @@ public class ExtensionModule extends ServletModule {
         // Init JavaScript and CSS resources from extensions
         Collection<Resource> javaScriptResources = new ArrayList<Resource>();
         Collection<Resource> cssResources = new ArrayList<Resource>();
+
+        // Veriffy that the possibly-cached index.html matches the current build
+        javaScriptResources.add(new WebApplicationResource(getServletContext(), "/verifyCachedVersion.js"));
 
         // Load all extensions
         final Set<String> toleratedAuthProviders = getToleratedAuthenticationProviders();

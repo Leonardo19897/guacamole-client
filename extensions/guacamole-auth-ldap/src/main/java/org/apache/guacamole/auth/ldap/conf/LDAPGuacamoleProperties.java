@@ -211,6 +211,17 @@ public class LDAPGuacamoleProperties {
     };
 
     /**
+     * A search filter to apply to group LDAP queries.
+     */
+    public static final LdapFilterGuacamoleProperty LDAP_GROUP_SEARCH_FILTER =
+            new LdapFilterGuacamoleProperty() {
+
+        @Override
+        public String getName() { return "ldap-group-search-filter"; }
+
+    };
+
+    /**
      * Whether or not we should follow referrals.
      */
     public static final BooleanGuacamoleProperty LDAP_FOLLOW_REFERRALS =
@@ -240,6 +251,17 @@ public class LDAPGuacamoleProperties {
 
         @Override
         public String getName() { return "ldap-operation-timeout"; }
+
+    };
+
+    /**
+     * Number of milliseconds to wait for responses from the LDAP server.
+     */
+    public static final IntegerGuacamoleProperty LDAP_NETWORK_TIMEOUT =
+            new IntegerGuacamoleProperty() {
+
+        @Override
+        public String getName() { return "ldap-network-timeout"; }
 
     };
 
