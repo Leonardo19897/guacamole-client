@@ -21,6 +21,8 @@ package org.apache.guacamole.rest.connection;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+
+import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -136,14 +138,21 @@ public class ConnectionResource extends DirectoryObjectResource<Connection, APIC
         // Deny access if adminstrative or update permission is missing
         String identifier = connection.getIdentifier();
         if (!systemPermissions.hasPermission(SystemPermission.Type.ADMINISTER)
-         && !connectionPermissions.hasPermission(ObjectPermission.Type.UPDATE, identifier))
+                && !connectionPermissions.hasPermission(ObjectPermission.Type.UPDATE, identifier) && !connectionPermissions.hasPermission(ObjectPermission.Type.READ, identifier))
             throw new GuacamoleSecurityException("Permission to read connection parameters denied.");
 
         // Retrieve connection configuration
         GuacamoleConfiguration config = connection.getConfiguration();
 
-        // Return parameter map
-        return config.getParameters();
+        if(systemPermissions.hasPermission(SystemPermission.Type.ADMINISTER) || connectionPermissions.hasPermission(ObjectPermission.Type.UPDATE, identifier)) {
+            // Return parameter map
+            return config.getParameters();
+        } else {
+            //TODO fare meglio (1: estensione, 2: modificare guacamole_connection, 3: aggiungere guacamole_connection_paramenter_read_only)
+            Map<String, String> configMap= new HashMap<>();
+            configMap.put("externalURL", config.getParameter("externalURL"));
+            return configMap;
+        }
 
     }
 
